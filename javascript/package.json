@@ -1,14 +1,71 @@
 {
-  "name": "dev",
+  "name": "algorithms-collection-js",
   "version": "1.0.0",
-  "description": "",
+  "description": "Comprehensive collection of algorithms and data structures implemented in JavaScript",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:verbose": "jest --verbose",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "prepare": "husky install"
   },
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "jest": "^27.0.5"
+  "keywords": [
+    "algorithms",
+    "data-structures",
+    "javascript",
+    "computer-science",
+    "interview-preparation",
+    "leetcode",
+    "sorting",
+    "searching",
+    "trees",
+    "graphs"
+  ],
+  "author": "Algorithms Collection Contributors",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/algorithms.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/algorithms/issues"
+  },
+  "homepage": "https://github.com/your-username/algorithms#readme",
+  "dependencies": {},
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "eslint": "^8.50.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-jest": "^27.4.0",
+    "prettier": "^3.0.3",
+    "husky": "^8.0.3",
+    "lint-staged": "^14.0.1"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "collectCoverageFrom": [
+      "**/*.js",
+      "!**/node_modules/**",
+      "!**/coverage/**"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 80,
+        "functions": 80,
+        "lines": 80,
+        "statements": 80
+      }
+    }
+  },
+  "lint-staged": {
+    "*.js": [
+      "eslint --fix",
+      "prettier --write"
+    ]
   }
 }
