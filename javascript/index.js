@@ -1,9 +1,9 @@
 /**
  * Algorithms Collection - JavaScript Implementation
- * 
+ *
  * This file exports all available algorithms organized by categories.
  * Each algorithm includes implementation, tests, and documentation.
- * 
+ *
  * @author Algorithms Collection Contributors
  * @license MIT
  */
@@ -25,11 +25,23 @@ const pyramid = require('./pyramid');
 
 // Sorting Algorithms
 const { bubbleSort, selectionSort, mergeSort, merge } = require('./sorting');
+const { quickSort, quickSortRandomized, quickSortPure } = require('./quicksort');
+const { heapSort, buildMaxHeap, extractMax, insertIntoHeap } = require('./heapsort');
+
+// Search Algorithms
+const { binarySearch, binarySearchRecursive, searchRotatedArray } = require('./binarysearch');
+
+// Graph Algorithms
+const { dijkstra, shortestPath, allPairsShortestPath } = require('./dijkstra');
+const { astar, manhattanDistance, euclideanDistance } = require('./astar');
+
+// Machine Learning Algorithms
+const { LinearRegression, KMeans, KNearestNeighbors } = require('./machinelearning');
 
 // Data Structures
 const { LinkedList, Node: LinkedListNode } = require('./linkedlist');
-const { Queue } = require('./queue');
-const { Stack } = require('./stack');
+const Queue = require('./queue');
+const Stack = require('./stack');
 const { Tree, Node: TreeNode } = require('./tree');
 
 // Tree Algorithms
@@ -84,6 +96,43 @@ const sortingAlgorithms = {
   selectionSort,
   mergeSort,
   merge,
+  quickSort,
+  quickSortRandomized,
+  quickSortPure,
+  heapSort,
+  buildMaxHeap,
+  extractMax,
+  insertIntoHeap,
+};
+
+/**
+ * Search Algorithms Category
+ */
+const searchAlgorithms = {
+  binarySearch,
+  binarySearchRecursive,
+  searchRotatedArray,
+};
+
+/**
+ * Graph Algorithms Category
+ */
+const graphAlgorithms = {
+  dijkstra,
+  shortestPath,
+  allPairsShortestPath,
+  astar,
+  manhattanDistance,
+  euclideanDistance,
+};
+
+/**
+ * Machine Learning Algorithms Category
+ */
+const machineLearningAlgorithms = {
+  LinearRegression,
+  KMeans,
+  KNearestNeighbors,
 };
 
 /**
@@ -147,6 +196,9 @@ const algorithms = {
   strings: stringAlgorithms,
   math: mathAlgorithms,
   sorting: sortingAlgorithms,
+  search: searchAlgorithms,
+  graphs: graphAlgorithms,
+  machineLearning: machineLearningAlgorithms,
   dataStructures,
   trees: treeAlgorithms,
   linkedLists: linkedListAlgorithms,
@@ -207,16 +259,19 @@ module.exports = {
   ...stringAlgorithms,
   ...mathAlgorithms,
   ...sortingAlgorithms,
+  ...searchAlgorithms,
+  ...graphAlgorithms,
+  ...machineLearningAlgorithms,
   ...dataStructures,
   ...treeAlgorithms,
   ...linkedListAlgorithms,
   ...queueStackAlgorithms,
   ...arrayAlgorithms,
   ...utilities,
-  
+
   // Organized by category
   algorithms,
-  
+
   // Utility functions
   getAlgorithm,
   listAlgorithms,

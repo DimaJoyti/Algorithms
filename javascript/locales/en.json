@@ -1,0 +1,159 @@
+{
+  "algorithms": {
+    "strings": {
+      "category": "String Algorithms",
+      "description": "Algorithms for string manipulation and analysis",
+      "anagrams": {
+        "name": "Anagrams",
+        "description": "Check if two strings are anagrams of each other"
+      },
+      "palindrome": {
+        "name": "Palindrome",
+        "description": "Check if a string reads the same forwards and backwards"
+      },
+      "reversestring": {
+        "name": "Reverse String",
+        "description": "Reverse the characters in a string"
+      },
+      "capitalize": {
+        "name": "Capitalize",
+        "description": "Capitalize the first letter of each word"
+      },
+      "maxchar": {
+        "name": "Max Character",
+        "description": "Find the most frequently used character in a string"
+      },
+      "vowels": {
+        "name": "Count Vowels",
+        "description": "Count the number of vowels in a string"
+      }
+    },
+    "math": {
+      "category": "Mathematical Algorithms",
+      "description": "Algorithms for mathematical computations and number theory",
+      "fib": {
+        "name": "Fibonacci",
+        "description": "Generate Fibonacci sequence numbers"
+      },
+      "fizzbuzz": {
+        "name": "FizzBuzz",
+        "description": "Classic programming challenge with divisibility rules"
+      },
+      "reverseint": {
+        "name": "Reverse Integer",
+        "description": "Reverse the digits of an integer"
+      },
+      "steps": {
+        "name": "Steps Pattern",
+        "description": "Print a step pattern using hash symbols"
+      },
+      "pyramid": {
+        "name": "Pyramid Pattern",
+        "description": "Print a pyramid pattern using hash symbols"
+      }
+    },
+    "sorting": {
+      "category": "Sorting Algorithms",
+      "description": "Algorithms for arranging data in order",
+      "bubbleSort": {
+        "name": "Bubble Sort",
+        "description": "Simple sorting algorithm that repeatedly steps through the list"
+      },
+      "selectionSort": {
+        "name": "Selection Sort",
+        "description": "Sorting algorithm that selects the minimum element repeatedly"
+      },
+      "mergeSort": {
+        "name": "Merge Sort",
+        "description": "Divide and conquer sorting algorithm"
+      },
+      "quickSort": {
+        "name": "Quick Sort",
+        "description": "Efficient divide and conquer sorting algorithm"
+      },
+      "heapSort": {
+        "name": "Heap Sort",
+        "description": "Comparison-based sorting using binary heap data structure"
+      }
+    },
+    "search": {
+      "category": "Search Algorithms",
+      "description": "Algorithms for finding elements in data structures",
+      "binarySearch": {
+        "name": "Binary Search",
+        "description": "Efficient search algorithm for sorted arrays"
+      },
+      "binarySearchRecursive": {
+        "name": "Binary Search (Recursive)",
+        "description": "Recursive implementation of binary search"
+      },
+      "searchRotatedArray": {
+        "name": "Search Rotated Array",
+        "description": "Search in a rotated sorted array"
+      }
+    },
+    "graphs": {
+      "category": "Graph Algorithms",
+      "description": "Algorithms for graph traversal and pathfinding",
+      "dijkstra": {
+        "name": "Dijkstra's Algorithm",
+        "description": "Find shortest paths in weighted graphs"
+      },
+      "astar": {
+        "name": "A* Pathfinding",
+        "description": "Heuristic-based pathfinding algorithm"
+      },
+      "shortestPath": {
+        "name": "Shortest Path",
+        "description": "Find the shortest path between two nodes"
+      }
+    },
+    "machineLearning": {
+      "category": "Machine Learning",
+      "description": "Basic machine learning algorithms and models",
+      "LinearRegression": {
+        "name": "Linear Regression",
+        "description": "Find the best fit line through data points"
+      },
+      "KMeans": {
+        "name": "K-Means Clustering",
+        "description": "Partition data into k clusters"
+      },
+      "KNearestNeighbors": {
+        "name": "K-Nearest Neighbors",
+        "description": "Classify data based on nearest neighbors"
+      }
+    }
+  },
+  "complexity": {
+    "time": "Time Complexity",
+    "space": "Space Complexity",
+    "best": "Best Case",
+    "average": "Average Case",
+    "worst": "Worst Case"
+  },
+  "ui": {
+    "start": "Start",
+    "pause": "Pause",
+    "resume": "Resume",
+    "reset": "Reset",
+    "randomize": "Randomize",
+    "speed": "Speed",
+    "comparisons": "Comparisons",
+    "swaps": "Swaps",
+    "arrayAccess": "Array Access",
+    "timeElapsed": "Time Elapsed",
+    "selectAlgorithm": "Select an Algorithm",
+    "algorithmInfo": "Algorithm Information",
+    "visualization": "Visualization",
+    "examples": "Examples",
+    "usage": "Usage"
+  },
+  "messages": {
+    "selectAlgorithmFirst": "Please select an algorithm first!",
+    "algorithmCompleted": "Algorithm completed successfully!",
+    "noPathFound": "No path found between the specified points",
+    "invalidInput": "Invalid input provided",
+    "trainingRequired": "Model must be trained before making predictions"
+  }
+}

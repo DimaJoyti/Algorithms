@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Algorithm Visualizations</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: 300;
+        }
+
+        .header p {
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .algorithm-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .algorithm-card {
+            border: 2px solid #e1e8ed;
+            border-radius: 12px;
+            padding: 25px;
+            background: #fafbfc;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .algorithm-card:hover {
+            border-color: #4facfe;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(79, 172, 254, 0.2);
+        }
+
+        .algorithm-card.active {
+            border-color: #4facfe;
+            background: #f0f8ff;
+        }
+
+        .algorithm-title {
+            font-size: 1.4em;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .algorithm-description {
+            color: #7f8c8d;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: #4facfe;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #3498db;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+
+        .btn-success {
+            background: #2ecc71;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #27ae60;
+        }
+
+        .visualization-area {
+            background: white;
+            border: 2px solid #e1e8ed;
+            border-radius: 12px;
+            padding: 20px;
+            min-height: 400px;
+            margin-bottom: 20px;
+        }
+
+        .canvas-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 350px;
+        }
+
+        canvas {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border-left: 4px solid #4facfe;
+        }
+
+        .stat-value {
+            font-size: 1.8em;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 2px solid #e1e8ed;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-group input:focus, .input-group select:focus {
+            outline: none;
+            border-color: #4facfe;
+        }
+
+        .algorithm-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .complexity-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .complexity-card {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid #e74c3c;
+        }
+
+        .complexity-card.time {
+            border-left-color: #e74c3c;
+        }
+
+        .complexity-card.space {
+            border-left-color: #f39c12;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .algorithm-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .controls {
+                justify-content: center;
+            }
+
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Algorithm Visualizations</h1>
+            <p>Interactive demonstrations of sorting, searching, and graph algorithms</p>
+        </div>
+
+        <div class="content">
+            <div class="algorithm-grid">
+                <div class="algorithm-card" data-algorithm="bubble-sort">
+                    <div class="algorithm-title">🫧 Bubble Sort</div>
+                    <div class="algorithm-description">
+                        Watch elements bubble up to their correct positions through adjacent swaps.
+                    </div>
+                </div>
+
+                <div class="algorithm-card" data-algorithm="quick-sort">
+                    <div class="algorithm-title">⚡ Quick Sort</div>
+                    <div class="algorithm-description">
+                        Divide and conquer sorting with pivot-based partitioning.
+                    </div>
+                </div>
+
+                <div class="algorithm-card" data-algorithm="binary-search">
+                    <div class="algorithm-title">🔍 Binary Search</div>
+                    <div class="algorithm-description">
+                        Efficiently find elements in sorted arrays by halving the search space.
+                    </div>
+                </div>
+
+                <div class="algorithm-card" data-algorithm="dijkstra">
+                    <div class="algorithm-title">🗺️ Dijkstra's Algorithm</div>
+                    <div class="algorithm-description">
+                        Find shortest paths in weighted graphs using greedy approach.
+                    </div>
+                </div>
+
+                <div class="algorithm-card" data-algorithm="a-star">
+                    <div class="algorithm-title">⭐ A* Pathfinding</div>
+                    <div class="algorithm-description">
+                        Intelligent pathfinding using heuristics to guide the search.
+                    </div>
+                </div>
+
+                <div class="algorithm-card" data-algorithm="linear-regression">
+                    <div class="algorithm-title">📈 Linear Regression</div>
+                    <div class="algorithm-description">
+                        Visualize how machine learning finds the best fit line through data.
+                    </div>
+                </div>
+            </div>
+
+            <div class="visualization-area">
+                <div class="controls">
+                    <button class="btn btn-primary" id="startBtn">▶️ Start</button>
+                    <button class="btn btn-secondary" id="pauseBtn">⏸️ Pause</button>
+                    <button class="btn btn-secondary" id="resetBtn">🔄 Reset</button>
+                    <button class="btn btn-success" id="randomizeBtn">🎲 Randomize</button>
+                </div>
+
+                <div class="input-group">
+                    <label for="speedSlider">Animation Speed:</label>
+                    <input type="range" id="speedSlider" min="1" max="10" value="5">
+                </div>
+
+                <div class="canvas-container">
+                    <canvas id="visualizationCanvas" width="800" height="400"></canvas>
+                </div>
+
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-value" id="comparisons">0</div>
+                        <div class="stat-label">Comparisons</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="swaps">0</div>
+                        <div class="stat-label">Swaps</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="arrayAccess">0</div>
+                        <div class="stat-label">Array Access</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="timeElapsed">0ms</div>
+                        <div class="stat-label">Time Elapsed</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="algorithm-info">
+                <h3 id="algorithmTitle">Select an Algorithm</h3>
+                <p id="algorithmDescription">Choose an algorithm from the cards above to see detailed information and complexity analysis.</p>
+
+                <div class="complexity-info">
+                    <div class="complexity-card time">
+                        <strong>Time Complexity</strong>
+                        <div id="timeComplexity">-</div>
+                    </div>
+                    <div class="complexity-card space">
+                        <strong>Space Complexity</strong>
+                        <div id="spaceComplexity">-</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="visualizations.js"></script>
+    <script>
+        // Initialize the visualization system when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const visualizer = new AlgorithmVisualizer();
+            visualizer.init();
+        });
+    </script>
+</body>
+</html>
