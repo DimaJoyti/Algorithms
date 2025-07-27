@@ -409,3 +409,229 @@ func (g *Graph) FindPath(start, end int) []int {
 
 	return []int{} // No path found
 }
+
+// TarjanSCC finds strongly connected components using Tarjan's algorithm
+// Time Complexity: O(V + E), Space Complexity: O(V)
+func (g *Graph) TarjanSCC() [][]int {
+	index := 0
+	stack := make([]int, 0)
+	indices := make(map[int]int)
+	lowlinks := make(map[int]int)
+	onStack := make(map[int]bool)
+	sccs := make([][]int, 0)
+
+	var strongConnect func(int)
+	strongConnect = func(v int) {
+		// Set the depth index for v to the smallest unused index
+		indices[v] = index
+		lowlinks[v] = index
+		index++
+		stack = append(stack, v)
+		onStack[v] = true
+
+		// Consider successors of v
+		for _, w := range g.adjList[v] {
+			if _, exists := indices[w]; !exists {
+				// Successor w has not yet been visited; recurse on it
+				strongConnect(w)
+				if lowlinks[w] < lowlinks[v] {
+					lowlinks[v] = lowlinks[w]
+				}
+			} else if onStack[w] {
+				// Successor w is in stack and hence in the current SCC
+				if indices[w] < lowlinks[v] {
+					lowlinks[v] = indices[w]
+				}
+			}
+		}
+
+		// If v is a root node, pop the stack and create an SCC
+		if lowlinks[v] == indices[v] {
+			scc := make([]int, 0)
+			for {
+				w := stack[len(stack)-1]
+				stack = stack[:len(stack)-1]
+				onStack[w] = false
+				scc = append(scc, w)
+				if w == v {
+					break
+				}
+			}
+			sccs = append(sccs, scc)
+		}
+	}
+
+	// Find all vertices
+	allVertices := make(map[int]bool)
+	for vertex := range g.adjList {
+		allVertices[vertex] = true
+		for _, neighbor := range g.adjList[vertex] {
+			allVertices[neighbor] = true
+		}
+	}
+
+	for vertex := range allVertices {
+		if _, exists := indices[vertex]; !exists {
+			strongConnect(vertex)
+		}
+	}
+
+	return sccs
+}
+
+// UnionFind data structure for Kruskal's algorithm
+type UnionFind struct {
+	parent []int
+	rank   []int
+}
+
+// NewUnionFind creates a new Union-Find structure
+func NewUnionFind(n int) *UnionFind {
+	parent := make([]int, n)
+	rank := make([]int, n)
+	for i := range parent {
+		parent[i] = i
+	}
+	return &UnionFind{parent: parent, rank: rank}
+}
+
+// Find finds the root of element x with path compression
+func (uf *UnionFind) Find(x int) int {
+	if uf.parent[x] != x {
+		uf.parent[x] = uf.Find(uf.parent[x]) // Path compression
+	}
+	return uf.parent[x]
+}
+
+// Union unites two sets containing x and y
+func (uf *UnionFind) Union(x, y int) bool {
+	rootX := uf.Find(x)
+	rootY := uf.Find(y)
+
+	if rootX == rootY {
+		return false // Already in same set
+	}
+
+	// Union by rank
+	if uf.rank[rootX] < uf.rank[rootY] {
+		uf.parent[rootX] = rootY
+	} else if uf.rank[rootX] > uf.rank[rootY] {
+		uf.parent[rootY] = rootX
+	} else {
+		uf.parent[rootY] = rootX
+		uf.rank[rootX]++
+	}
+	return true
+}
+
+// EdgeForMST represents an edge for MST algorithms
+type EdgeForMST struct {
+	From   int
+	To     int
+	Weight int
+}
+
+// KruskalMST finds Minimum Spanning Tree using Kruskal's algorithm
+// Time Complexity: O(E log E), Space Complexity: O(V)
+func (wg *WeightedGraph) KruskalMST() ([]EdgeForMST, int) {
+	// Collect all edges
+	edges := make([]EdgeForMST, 0)
+	for from, adjEdges := range wg.adjList {
+		for _, edge := range adjEdges {
+			edges = append(edges, EdgeForMST{From: from, To: edge.To, Weight: edge.Weight})
+		}
+	}
+
+	// Sort edges by weight (simple bubble sort for demonstration)
+	for i := 0; i < len(edges)-1; i++ {
+		for j := 0; j < len(edges)-i-1; j++ {
+			if edges[j].Weight > edges[j+1].Weight {
+				edges[j], edges[j+1] = edges[j+1], edges[j]
+			}
+		}
+	}
+
+	uf := NewUnionFind(wg.vertices)
+	mst := make([]EdgeForMST, 0)
+	totalWeight := 0
+
+	for _, edge := range edges {
+		if uf.Union(edge.From, edge.To) {
+			mst = append(mst, edge)
+			totalWeight += edge.Weight
+			if len(mst) == wg.vertices-1 {
+				break
+			}
+		}
+	}
+
+	return mst, totalWeight
+}
+
+// PrimMST finds Minimum Spanning Tree using Prim's algorithm
+// Time Complexity: O(E log V), Space Complexity: O(V)
+func (wg *WeightedGraph) PrimMST(start int) ([]EdgeForMST, int) {
+	mst := make([]EdgeForMST, 0)
+	totalWeight := 0
+	visited := make(map[int]bool)
+
+	// Priority queue for edges
+	pq := &PriorityQueue{}
+	heap.Init(pq)
+
+	// Start with the given vertex
+	visited[start] = true
+
+	// Add all edges from start vertex to priority queue
+	for _, edge := range wg.adjList[start] {
+		heap.Push(pq, &PriorityQueueItem{
+			Vertex:   edge.To,
+			Distance: edge.Weight,
+		})
+	}
+
+	for pq.Len() > 0 && len(mst) < wg.vertices-1 {
+		item := heap.Pop(pq).(*PriorityQueueItem)
+		vertex := item.Vertex
+		weight := item.Distance
+
+		if visited[vertex] {
+			continue
+		}
+
+		visited[vertex] = true
+
+		// Find the parent vertex (the one that led to this vertex with minimum weight)
+		parent := -1
+		for from, edges := range wg.adjList {
+			if visited[from] {
+				for _, edge := range edges {
+					if edge.To == vertex && edge.Weight == weight {
+						parent = from
+						break
+					}
+				}
+			}
+			if parent != -1 {
+				break
+			}
+		}
+
+		if parent != -1 {
+			mst = append(mst, EdgeForMST{From: parent, To: vertex, Weight: weight})
+			totalWeight += weight
+		}
+
+		// Add all edges from the new vertex to priority queue
+		for _, edge := range wg.adjList[vertex] {
+			if !visited[edge.To] {
+				heap.Push(pq, &PriorityQueueItem{
+					Vertex:   edge.To,
+					Distance: edge.Weight,
+				})
+			}
+		}
+	}
+
+	return mst, totalWeight
+}

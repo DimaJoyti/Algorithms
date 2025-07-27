@@ -260,6 +260,20 @@ func main() {
 	knnPred, _ := knn.Predict([][]float64{{1.5, 1.5}, {5.5, 5.5}})
 	fmt.Printf("K-NN: predict classes for (1.5,1.5) and (5.5,5.5) = [%.1f, %.1f]\n", knnPred[0], knnPred[1])
 
+	// Demonstrate new advanced sorting algorithms
+	fmt.Println("\n🔄 Advanced Sorting Algorithms:")
+	advancedArr := []int{64, 34, 25, 12, 22, 11, 90, 5, 77, 30}
+	fmt.Printf("Original array: %v\n", advancedArr)
+
+	bucketSorted := sorting.BucketSort(advancedArr)
+	fmt.Printf("Bucket Sort:    %v\n", bucketSorted)
+
+	pancakeSorted := sorting.PancakeSort(advancedArr)
+	fmt.Printf("Pancake Sort:   %v\n", pancakeSorted)
+
+	timSorted := sorting.TimSort(advancedArr)
+	fmt.Printf("Tim Sort:       %v\n", timSorted)
+
 	fmt.Println("\n✨ Go implementation complete! All algorithms tested and working.")
 	fmt.Println("📚 Check the test files for detailed usage examples and edge cases.")
 }

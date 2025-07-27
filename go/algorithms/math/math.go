@@ -375,3 +375,151 @@ func max(a, b int) int {
 	}
 	return b
 }
+
+// FastExponentiation computes base^exp % mod efficiently
+// Time Complexity: O(log exp), Space Complexity: O(1)
+func FastExponentiation(base, exp, mod int) int {
+	if mod == 1 {
+		return 0
+	}
+
+	result := 1
+	base = base % mod
+
+	for exp > 0 {
+		// If exp is odd, multiply base with result
+		if exp%2 == 1 {
+			result = (result * base) % mod
+		}
+
+		// Now exp must be even
+		exp = exp >> 1 // exp = exp / 2
+		base = (base * base) % mod
+	}
+
+	return result
+}
+
+// FastExponentiationNonMod computes base^exp without modulo
+// Time Complexity: O(log exp), Space Complexity: O(1)
+func FastExponentiationNonMod(base, exp int) int {
+	if exp == 0 {
+		return 1
+	}
+	if exp == 1 {
+		return base
+	}
+
+	result := 1
+	for exp > 0 {
+		if exp%2 == 1 {
+			result *= base
+		}
+		base *= base
+		exp >>= 1
+	}
+
+	return result
+}
+
+// MillerRabinPrimality performs Miller-Rabin primality test
+// Time Complexity: O(k log³ n), Space Complexity: O(1) where k is number of rounds
+func MillerRabinPrimality(n int, k int) bool {
+	if n <= 1 || n == 4 {
+		return false
+	}
+	if n <= 3 {
+		return true
+	}
+	if n%2 == 0 {
+		return false
+	}
+
+	// Write n-1 as d * 2^r by factoring powers of 2 from n-1
+	d := n - 1
+	r := 0
+	for d%2 == 0 {
+		d /= 2
+		r++
+	}
+
+	// Witness loop
+	for i := 0; i < k; i++ {
+		a := 2 + (i*7)%(n-3) // Simple deterministic sequence for testing
+		if a >= n {
+			a = 2
+		}
+
+		x := FastExponentiation(a, d, n)
+		if x == 1 || x == n-1 {
+			continue
+		}
+
+		composite := true
+		for j := 0; j < r-1; j++ {
+			x = FastExponentiation(x, 2, n)
+			if x == n-1 {
+				composite = false
+				break
+			}
+		}
+
+		if composite {
+			return false
+		}
+	}
+
+	return true
+}
+
+// IsPrimeMR checks if a number is prime using Miller-Rabin test
+// Time Complexity: O(log³ n), Space Complexity: O(1)
+func IsPrimeMR(n int) bool {
+	if n <= 1 {
+		return false
+	}
+	if n <= 3 {
+		return true
+	}
+	if n%2 == 0 || n%3 == 0 {
+		return false
+	}
+
+	// Use Miller-Rabin with 5 rounds for good accuracy
+	return MillerRabinPrimality(n, 5)
+}
+
+// EulerTotient computes Euler's totient function φ(n)
+// Time Complexity: O(√n), Space Complexity: O(1)
+func EulerTotient(n int) int {
+	if n <= 1 {
+		return 0
+	}
+
+	result := n
+
+	// Check for factor 2
+	if n%2 == 0 {
+		result -= result / 2
+		for n%2 == 0 {
+			n /= 2
+		}
+	}
+
+	// Check for odd factors
+	for i := 3; i*i <= n; i += 2 {
+		if n%i == 0 {
+			result -= result / i
+			for n%i == 0 {
+				n /= i
+			}
+		}
+	}
+
+	// If n is still greater than 1, then it's a prime
+	if n > 1 {
+		result -= result / n
+	}
+
+	return result
+}
