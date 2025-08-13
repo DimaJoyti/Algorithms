@@ -52,11 +52,11 @@ func TestLISOptimized(t *testing.T) {
 
 func TestKnapsack01(t *testing.T) {
 	tests := []struct {
-		name         string
-		items        []KnapsackItem
-		capacity     int
-		expectedVal  int
-		expectedLen  int
+		name        string
+		items       []KnapsackItem
+		capacity    int
+		expectedVal int
+		expectedLen int
 	}{
 		{
 			"Empty items",
@@ -232,7 +232,7 @@ func TestHouseRobber(t *testing.T) {
 		{"Empty houses", []int{}, 0},
 		{"Single house", []int{5}, 5},
 		{"Two houses", []int{2, 7}, 7},
-		{"Three houses", []int{2, 1, 1}, 2},
+		{"Three houses", []int{2, 1, 1}, 3},
 		{"Classic example", []int{2, 7, 9, 3, 1}, 12},
 		{"Another example", []int{1, 2, 3, 1}, 4},
 	}

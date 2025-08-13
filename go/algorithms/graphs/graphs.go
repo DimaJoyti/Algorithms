@@ -635,3 +635,361 @@ func (wg *WeightedGraph) PrimMST(start int) ([]EdgeForMST, int) {
 
 	return mst, totalWeight
 }
+
+// KosarajuSCC finds strongly connected components using Kosaraju's algorithm
+// Time Complexity: O(V + E), Space Complexity: O(V)
+func (g *Graph) KosarajuSCC() [][]int {
+	// Step 1: Fill vertices in stack according to their finishing times
+	visited := make(map[int]bool)
+	stack := make([]int, 0)
+
+	// Get all vertices
+	allVertices := make(map[int]bool)
+	for vertex := range g.adjList {
+		allVertices[vertex] = true
+		for _, neighbor := range g.adjList[vertex] {
+			allVertices[neighbor] = true
+		}
+	}
+
+	var fillOrder func(int)
+	fillOrder = func(v int) {
+		visited[v] = true
+		for _, neighbor := range g.adjList[v] {
+			if !visited[neighbor] {
+				fillOrder(neighbor)
+			}
+		}
+		stack = append(stack, v)
+	}
+
+	for vertex := range allVertices {
+		if !visited[vertex] {
+			fillOrder(vertex)
+		}
+	}
+
+	// Step 2: Create transpose graph
+	transpose := NewGraph(g.vertices)
+	for vertex, neighbors := range g.adjList {
+		for _, neighbor := range neighbors {
+			transpose.AddEdge(neighbor, vertex)
+		}
+	}
+
+	// Step 3: Process vertices in reverse order of finishing times
+	visited = make(map[int]bool)
+	sccs := make([][]int, 0)
+
+	var dfsTranspose func(int, *[]int)
+	dfsTranspose = func(v int, component *[]int) {
+		visited[v] = true
+		*component = append(*component, v)
+		for _, neighbor := range transpose.adjList[v] {
+			if !visited[neighbor] {
+				dfsTranspose(neighbor, component)
+			}
+		}
+	}
+
+	// Process vertices in reverse order
+	for i := len(stack) - 1; i >= 0; i-- {
+		vertex := stack[i]
+		if !visited[vertex] {
+			component := make([]int, 0)
+			dfsTranspose(vertex, &component)
+			sccs = append(sccs, component)
+		}
+	}
+
+	return sccs
+}
+
+// ArticulationPoints finds articulation points (cut vertices) in the graph
+// Time Complexity: O(V + E), Space Complexity: O(V)
+func (g *Graph) ArticulationPoints() []int {
+	visited := make(map[int]bool)
+	disc := make(map[int]int)
+	low := make(map[int]int)
+	parent := make(map[int]int)
+	ap := make(map[int]bool)
+	time := 0
+
+	// Get all vertices
+	allVertices := make(map[int]bool)
+	for vertex := range g.adjList {
+		allVertices[vertex] = true
+		for _, neighbor := range g.adjList[vertex] {
+			allVertices[neighbor] = true
+		}
+	}
+
+	var apUtil func(int)
+	apUtil = func(u int) {
+		children := 0
+		visited[u] = true
+		disc[u] = time
+		low[u] = time
+		time++
+
+		for _, v := range g.adjList[u] {
+			if !visited[v] {
+				children++
+				parent[v] = u
+				apUtil(v)
+
+				// Update low value of u for parent function calls
+				if low[v] < low[u] {
+					low[u] = low[v]
+				}
+
+				// u is an articulation point in following cases:
+				// (1) u is root of DFS tree and has two or more children
+				if parent[u] == -1 && children > 1 {
+					ap[u] = true
+				}
+
+				// (2) u is not root and low value of one of its child is more than discovery value of u
+				if parent[u] != -1 && low[v] >= disc[u] {
+					ap[u] = true
+				}
+			} else if v != parent[u] {
+				// Update low value of u for back edge
+				if disc[v] < low[u] {
+					low[u] = disc[v]
+				}
+			}
+		}
+	}
+
+	// Initialize parent as -1 for all vertices
+	for vertex := range allVertices {
+		parent[vertex] = -1
+	}
+
+	// Call the recursive helper function for all vertices
+	for vertex := range allVertices {
+		if !visited[vertex] {
+			apUtil(vertex)
+		}
+	}
+
+	// Collect articulation points
+	result := make([]int, 0)
+	for vertex := range ap {
+		result = append(result, vertex)
+	}
+
+	return result
+}
+
+// Bridges finds all bridges (cut edges) in the graph
+// Time Complexity: O(V + E), Space Complexity: O(V)
+func (g *Graph) Bridges() [][2]int {
+	visited := make(map[int]bool)
+	disc := make(map[int]int)
+	low := make(map[int]int)
+	parent := make(map[int]int)
+	bridges := make([][2]int, 0)
+	time := 0
+
+	// Get all vertices
+	allVertices := make(map[int]bool)
+	for vertex := range g.adjList {
+		allVertices[vertex] = true
+		for _, neighbor := range g.adjList[vertex] {
+			allVertices[neighbor] = true
+		}
+	}
+
+	var bridgeUtil func(int)
+	bridgeUtil = func(u int) {
+		visited[u] = true
+		disc[u] = time
+		low[u] = time
+		time++
+
+		for _, v := range g.adjList[u] {
+			if !visited[v] {
+				parent[v] = u
+				bridgeUtil(v)
+
+				// Update low value of u for parent function calls
+				if low[v] < low[u] {
+					low[u] = low[v]
+				}
+
+				// If the lowest vertex reachable from subtree under v is below u in DFS tree, then u-v is a bridge
+				if low[v] > disc[u] {
+					bridges = append(bridges, [2]int{u, v})
+				}
+			} else if v != parent[u] {
+				// Update low value of u for back edge
+				if disc[v] < low[u] {
+					low[u] = disc[v]
+				}
+			}
+		}
+	}
+
+	// Initialize parent as -1 for all vertices
+	for vertex := range allVertices {
+		parent[vertex] = -1
+	}
+
+	// Call the recursive helper function for all vertices
+	for vertex := range allVertices {
+		if !visited[vertex] {
+			bridgeUtil(vertex)
+		}
+	}
+
+	return bridges
+}
+
+// FlowNetwork represents a flow network for maximum flow algorithms
+type FlowNetwork struct {
+	vertices int
+	capacity [][]int
+	adjList  [][]int
+}
+
+// NewFlowNetwork creates a new flow network
+func NewFlowNetwork(vertices int) *FlowNetwork {
+	capacity := make([][]int, vertices)
+	adjList := make([][]int, vertices)
+	for i := range capacity {
+		capacity[i] = make([]int, vertices)
+		adjList[i] = make([]int, 0)
+	}
+	return &FlowNetwork{
+		vertices: vertices,
+		capacity: capacity,
+		adjList:  adjList,
+	}
+}
+
+// AddEdge adds an edge with given capacity to the flow network
+func (fn *FlowNetwork) AddEdge(from, to, cap int) {
+	fn.capacity[from][to] = cap
+	fn.adjList[from] = append(fn.adjList[from], to)
+	fn.adjList[to] = append(fn.adjList[to], from) // Add reverse edge for residual graph
+}
+
+// FordFulkerson implements Ford-Fulkerson algorithm for maximum flow
+// Time Complexity: O(E * max_flow), Space Complexity: O(V²)
+func (fn *FlowNetwork) FordFulkerson(source, sink int) int {
+	// Create residual graph
+	residual := make([][]int, fn.vertices)
+	for i := range residual {
+		residual[i] = make([]int, fn.vertices)
+		copy(residual[i], fn.capacity[i])
+	}
+
+	parent := make([]int, fn.vertices)
+	maxFlow := 0
+
+	// Augment the flow while there is path from source to sink
+	for fn.bfs(residual, source, sink, parent) {
+		// Find minimum residual capacity of the edges along the path filled by BFS
+		pathFlow := int(^uint(0) >> 1) // Max int
+		for s := sink; s != source; s = parent[s] {
+			if residual[parent[s]][s] < pathFlow {
+				pathFlow = residual[parent[s]][s]
+			}
+		}
+
+		// Add path flow to overall flow
+		maxFlow += pathFlow
+
+		// Update residual capacities of the edges and reverse edges along the path
+		for v := sink; v != source; v = parent[v] {
+			u := parent[v]
+			residual[u][v] -= pathFlow
+			residual[v][u] += pathFlow
+		}
+	}
+
+	return maxFlow
+}
+
+// bfs performs BFS to find if there's a path from source to sink in residual graph
+func (fn *FlowNetwork) bfs(residual [][]int, source, sink int, parent []int) bool {
+	visited := make([]bool, fn.vertices)
+	queue := make([]int, 0)
+
+	queue = append(queue, source)
+	visited[source] = true
+	parent[source] = -1
+
+	for len(queue) > 0 {
+		u := queue[0]
+		queue = queue[1:]
+
+		for v := 0; v < fn.vertices; v++ {
+			if !visited[v] && residual[u][v] > 0 {
+				queue = append(queue, v)
+				parent[v] = u
+				visited[v] = true
+				if v == sink {
+					return true
+				}
+			}
+		}
+	}
+
+	return false
+}
+
+// EdmondsKarp implements Edmonds-Karp algorithm (Ford-Fulkerson with BFS)
+// Time Complexity: O(V * E²), Space Complexity: O(V²)
+func (fn *FlowNetwork) EdmondsKarp(source, sink int) int {
+	// This is essentially the same as Ford-Fulkerson since we're already using BFS
+	// The difference is that Edmonds-Karp specifically uses BFS for finding augmenting paths
+	return fn.FordFulkerson(source, sink)
+}
+
+// GetMinCut returns the minimum cut of the flow network after running max flow
+func (fn *FlowNetwork) GetMinCut(source, sink int) ([]int, []int) {
+	// Run max flow first
+	fn.FordFulkerson(source, sink)
+
+	// Create residual graph
+	residual := make([][]int, fn.vertices)
+	for i := range residual {
+		residual[i] = make([]int, fn.vertices)
+		copy(residual[i], fn.capacity[i])
+	}
+
+	// Find vertices reachable from source in residual graph
+	visited := make([]bool, fn.vertices)
+	queue := make([]int, 0)
+	queue = append(queue, source)
+	visited[source] = true
+
+	for len(queue) > 0 {
+		u := queue[0]
+		queue = queue[1:]
+
+		for v := 0; v < fn.vertices; v++ {
+			if !visited[v] && residual[u][v] > 0 {
+				visited[v] = true
+				queue = append(queue, v)
+			}
+		}
+	}
+
+	// Partition vertices into two sets
+	sourceSet := make([]int, 0)
+	sinkSet := make([]int, 0)
+
+	for i := 0; i < fn.vertices; i++ {
+		if visited[i] {
+			sourceSet = append(sourceSet, i)
+		} else {
+			sinkSet = append(sinkSet, i)
+		}
+	}
+
+	return sourceSet, sinkSet
+}
