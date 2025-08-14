@@ -26,6 +26,40 @@ Distributed systems are collections of independent computers that appear to user
 
 ### The Fundamental Trade-off
 ```
+                    CAP Theorem Triangle
+
+                      Consistency (C)
+                           /\
+                          /  \
+                         /    \
+                        /      \
+                       /   CP   \
+                      /  Systems \
+                     /            \
+                    /              \
+                   /                \
+                  /                  \
+                 /                    \
+                /                      \
+               /                        \
+              /                          \
+             /                            \
+            /                              \
+           /                                \
+          /                                  \
+         /                                    \
+        /                                      \
+       /                                        \
+      /                                          \
+     /                                            \
+    /                                              \
+   /                                                \
+  /                                                  \
+ /                                                    \
+/                                                      \
+Availability (A) ──────────────────────────────── Partition Tolerance (P)
+                            AP Systems
+
 CAP Theorem States: In a distributed system, you can only guarantee 2 out of 3:
 
 C - Consistency: All nodes see the same data simultaneously
@@ -33,9 +67,60 @@ A - Availability: System remains operational
 P - Partition Tolerance: System continues despite network failures
 
 Real-world implications:
-- CP Systems: Sacrifice availability for consistency (traditional RDBMS)
-- AP Systems: Sacrifice consistency for availability (DNS, web caches)
-- CA Systems: Only possible without network partitions (single-node systems)
+┌─────────────────┬─────────────────┬─────────────────┐
+│   CP Systems    │   AP Systems    │   CA Systems    │
+├─────────────────┼─────────────────┼─────────────────┤
+│ • Traditional   │ • DNS           │ • Single-node   │
+│   RDBMS         │ • Web caches    │   systems       │
+│ • HBase         │ • Cassandra     │ • LDAP          │
+│ • MongoDB       │ • DynamoDB      │ • xFS           │
+│ • Redis Cluster │ • CouchDB       │                 │
+├─────────────────┼─────────────────┼─────────────────┤
+│ Sacrifice:      │ Sacrifice:      │ Sacrifice:      │
+│ Availability    │ Consistency     │ Partition       │
+│                 │                 │ Tolerance       │
+└─────────────────┴─────────────────┴─────────────────┘
+```
+
+### CAP Theorem Visual Examples
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    CP System Example                       │
+│                  (MongoDB Replica Set)                     │
+└─────────────────────────────────────────────────────────────┘
+
+Normal Operation:
+┌─────────┐    ┌─────────┐    ┌─────────┐
+│Primary  │◄──►│Secondary│◄──►│Secondary│
+│  Node   │    │  Node   │    │  Node   │
+│ (Write) │    │ (Read)  │    │ (Read)  │
+└─────────┘    └─────────┘    └─────────┘
+
+Network Partition:
+┌─────────┐    ┌─────────┐ ╱╱ ┌─────────┐
+│Primary  │◄──►│Secondary│╱╱  │Secondary│
+│  Node   │    │  Node   │    │  Node   │
+│ (Write) │    │ (Read)  │    │(Offline)│
+└─────────┘    └─────────┘    └─────────┘
+Result: Consistency maintained, but availability reduced
+
+┌─────────────────────────────────────────────────────────────┐
+│                    AP System Example                       │
+│                   (Cassandra Cluster)                      │
+└─────────────────────────────────────────────────────────────┘
+
+Normal Operation:
+┌─────────┐    ┌─────────┐    ┌─────────┐
+│  Node   │◄──►│  Node   │◄──►│  Node   │
+│ (R/W)   │    │ (R/W)   │    │ (R/W)   │
+└─────────┘    └─────────┘    └─────────┘
+
+Network Partition:
+┌─────────┐    ┌─────────┐ ╱╱ ┌─────────┐
+│  Node   │◄──►│  Node   │╱╱  │  Node   │
+│ (R/W)   │    │ (R/W)   │    │ (R/W)   │
+└─────────┘    └─────────┘    └─────────┘
+Result: Availability maintained, but temporary inconsistency
 ```
 
 ### CAP Theorem in Practice

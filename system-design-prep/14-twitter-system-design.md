@@ -134,17 +134,125 @@ func EstimateInfrastructure() InfrastructureNeeds {
 
 ### System Architecture
 ```
-[Mobile Apps] ──┐
-                ├── [Load Balancer] ── [API Gateway]
-[Web Apps] ─────┘                           │
-                                           ├── [User Service]
-                                           ├── [Tweet Service]
-                                           ├── [Timeline Service]
-                                           ├── [Follow Service]
-                                           ├── [Search Service]
-                                           └── [Media Service]
-                                                    │
-                                    [Message Queue] ── [Cache Layer] ── [Database Layer]
+┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+│ Mobile Apps │    │ Web Clients │    │ Third-party │
+│   (iOS/     │    │  (React/    │    │    APIs     │
+│  Android)   │    │   Vue.js)   │    │             │
+└──────┬──────┘    └──────┬──────┘    └──────┬──────┘
+       │                  │                  │
+       └──────────────────┼──────────────────┘
+                          │
+                ┌─────────▼─────────┐
+                │   Load Balancer   │
+                │    (HAProxy/      │
+                │     Nginx)        │
+                └─────────┬─────────┘
+                          │
+                ┌─────────▼─────────┐
+                │   API Gateway     │
+                │  (Authentication, │
+                │ Rate Limiting,    │
+                │   Routing)        │
+                └─────────┬─────────┘
+                          │
+        ┌─────────────────┼─────────────────┐
+        │                 │                 │
+┌───────▼───────┐ ┌───────▼───────┐ ┌───────▼───────┐
+│ User Service  │ │ Tweet Service │ │Timeline Service│
+│ - Profile     │ │ - Create      │ │ - Home Feed   │
+│ - Follow      │ │ - Delete      │ │ - User Feed   │
+│ - Auth        │ │ - Like/RT     │ │ - Trending    │
+└───────┬───────┘ └───────┬───────┘ └───────┬───────┘
+        │                 │                 │
+        │         ┌───────▼───────┐         │
+        │         │ Search Service│         │
+        │         │ - Full-text   │         │
+        │         │ - Hashtags    │         │
+        │         │ - Users       │         │
+        │         └───────┬───────┘         │
+        │                 │                 │
+        │         ┌───────▼───────┐         │
+        │         │ Media Service │         │
+        │         │ - Upload      │         │
+        │         │ - Process     │         │
+        │         │ - CDN         │         │
+        │         └───────┬───────┘         │
+        │                 │                 │
+┌───────▼─────────────────▼─────────────────▼───────┐
+│                Data Layer                         │
+├─────────────┬─────────────┬─────────────┬─────────┤
+│   User DB   │  Tweet DB   │Timeline     │ Media   │
+│(PostgreSQL) │(Cassandra)  │Cache(Redis) │Storage  │
+│             │             │             │ (S3)    │
+└─────────────┴─────────────┴─────────────┴─────────┘
+```
+
+### Data Flow Diagrams
+
+#### Tweet Creation Flow
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Tweet Creation Flow                      │
+└─────────────────────────────────────────────────────────────┘
+
+User ──1──► API Gateway ──2──► Tweet Service ──3──► Tweet DB
+                                     │
+                                     4
+                                     ▼
+                              Timeline Service ──5──► Timeline Cache
+                                     │
+                                     6
+                                     ▼
+                              Search Service ──7──► Search Index
+                                     │
+                                     8
+                                     ▼
+                              Media Service ──9──► CDN
+
+1. User creates tweet
+2. Authentication & rate limiting
+3. Store tweet in Cassandra
+4. Trigger timeline update
+5. Update follower timelines (fanout)
+6. Index tweet for search
+7. Update Elasticsearch index
+8. Process media attachments
+9. Upload to CDN for global delivery
+```
+
+#### Timeline Generation Flow
+```
+┌─────────────────────────────────────────────────────────────┐
+│                   Timeline Generation Flow                  │
+└─────────────────────────────────────────────────────────────┘
+
+User ──1──► Timeline Service ──2──► Timeline Cache
+                   │                      │
+                   3                      │ Cache Miss
+                   ▼                      │
+            Follow Service ──4──► User DB │
+                   │                      │
+                   5                      │
+                   ▼                      │
+            Tweet Service ──6──► Tweet DB │
+                   │                      │
+                   7                      │
+                   ▼                      │
+            Ranking Engine ──8────────────┘
+                   │
+                   9
+                   ▼
+              User Timeline
+
+1. User requests home timeline
+2. Check Redis cache for timeline
+3. If cache miss, get following list
+4. Fetch user's following from PostgreSQL
+5. Get recent tweets from followed users
+6. Fetch tweets from Cassandra
+7. Apply ML ranking algorithm
+8. Cache ranked timeline in Redis
+9. Return personalized timeline
 ```
 
 ### Core Services

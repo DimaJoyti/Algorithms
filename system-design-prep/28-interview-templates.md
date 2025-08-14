@@ -19,12 +19,54 @@ These templates provide structured frameworks for system design interviews, ensu
 
 ### ⏰ Time Allocation (45-minute interview)
 ```
+┌─────────────────────────────────────────────────────────────┐
+│              System Design Interview Timeline               │
+│                    (45 minutes total)                      │
+└─────────────────────────────────────────────────────────────┘
+
+0────5────10───15───20───25───30───35───40───45 (minutes)
+│    │     │    │    │    │    │    │    │    │
+│ P1 │ P2  │    P3   │         P4        │ P5 │P6
+│    │     │         │                   │    │
+
 Phase 1: Requirements Clarification (5-8 minutes)
+├─ Functional requirements (3-4 min)
+├─ Non-functional requirements (2-3 min)
+└─ Constraints and assumptions (1 min)
+
 Phase 2: Capacity Estimation (3-5 minutes)
+├─ User and traffic estimation (2 min)
+├─ Storage calculation (1-2 min)
+└─ Bandwidth estimation (1 min)
+
 Phase 3: High-Level Design (10-15 minutes)
+├─ System architecture overview (5-7 min)
+├─ Major components identification (3-4 min)
+├─ Data flow design (2-3 min)
+└─ Technology stack selection (1-2 min)
+
 Phase 4: Detailed Design (15-20 minutes)
+├─ Database design (5-7 min)
+├─ API design (3-5 min)
+├─ Core algorithms (4-6 min)
+└─ Caching strategy (3-4 min)
+
 Phase 5: Scale & Optimize (8-12 minutes)
+├─ Bottleneck identification (3-4 min)
+├─ Scaling strategies (3-4 min)
+├─ Performance optimization (2-3 min)
+└─ Monitoring and reliability (1-2 min)
+
 Phase 6: Wrap-up & Questions (3-5 minutes)
+├─ Design summary (1-2 min)
+├─ Trade-offs discussion (1-2 min)
+└─ Questions for interviewer (1-2 min)
+
+⚠️  Time Management Tips:
+• Keep track of time throughout
+• Don't spend too long on any single phase
+• Leave buffer time for unexpected deep dives
+• Practice with timer to build muscle memory
 ```
 
 ### 📝 Phase 1: Requirements Clarification (5-8 minutes)

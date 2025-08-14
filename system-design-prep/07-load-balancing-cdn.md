@@ -19,7 +19,78 @@ Load Balancer Benefits:
 
 ### Load Balancer Types
 
+#### Load Balancer Architecture Overview
+```
+┌─────────────────────────────────────────────────────────────┐
+│                Load Balancer Hierarchy                     │
+└─────────────────────────────────────────────────────────────┘
+
+Internet ──► DNS Load Balancer ──► Geographic Distribution
+                     │
+                     ▼
+            ┌─────────────────┐
+            │ Global Load     │
+            │ Balancer        │
+            │ (Layer 7)       │
+            └─────────┬───────┘
+                      │
+        ┌─────────────┼─────────────┐
+        │             │             │
+        ▼             ▼             ▼
+┌─────────────┐ ┌─────────────┐ ┌─────────────┐
+│Regional LB  │ │Regional LB  │ │Regional LB  │
+│(Layer 4)    │ │(Layer 4)    │ │(Layer 4)    │
+└─────┬───────┘ └─────┬───────┘ └─────┬───────┘
+      │               │               │
+      ▼               ▼               ▼
+┌─────────────┐ ┌─────────────┐ ┌─────────────┐
+│Server Pool  │ │Server Pool  │ │Server Pool  │
+│US-East      │ │US-West      │ │EU-West      │
+└─────────────┘ └─────────────┘ └─────────────┘
+
+Layer 4 vs Layer 7 Comparison:
+┌─────────────────┬─────────────────┬─────────────────┐
+│    Feature      │    Layer 4      │    Layer 7      │
+├─────────────────┼─────────────────┼─────────────────┤
+│ Protocol        │ TCP/UDP         │ HTTP/HTTPS      │
+│ Speed           │ Very Fast       │ Moderate        │
+│ CPU Usage       │ Low             │ High            │
+│ SSL Termination │ No              │ Yes             │
+│ Content Routing │ No              │ Yes             │
+│ Health Checks   │ Basic           │ Advanced        │
+│ Caching         │ No              │ Yes             │
+│ Compression     │ No              │ Yes             │
+└─────────────────┴─────────────────┴─────────────────┘
+```
+
 #### Layer 4 (Transport Layer) Load Balancing
+```
+┌─────────────────────────────────────────────────────────────┐
+│                Layer 4 Load Balancing                      │
+└─────────────────────────────────────────────────────────────┘
+
+Client ──TCP/UDP──► Load Balancer ──TCP/UDP──► Server
+                         │
+                         ▼
+                   Route based on:
+                   • Source IP
+                   • Source Port
+                   • Destination IP
+                   • Destination Port
+
+Flow Diagram:
+┌─────────┐    ┌─────────────┐    ┌─────────┐
+│ Client  │──1─►│Layer 4 LB   │──2─►│Server 1 │
+│         │    │             │    │         │
+│         │    │ - Fast      │──3─►│Server 2 │
+│         │    │ - Simple    │    │         │
+│         │    │ - Protocol  │──4─►│Server 3 │
+│         │    │   Agnostic  │    │         │
+└─────────┘    └─────────────┘    └─────────┘
+
+1. Client sends TCP/UDP packet
+2-4. LB forwards to available server
+```
 ```go
 // TCP/UDP level load balancing
 type L4LoadBalancer struct {

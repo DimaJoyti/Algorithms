@@ -180,17 +180,135 @@ func EstimateInfrastructure() InfrastructureNeeds {
 
 ### System Architecture
 ```
-[Mobile Apps] ──┐
-[Smart TVs] ────┼── [Global Load Balancer] ── [API Gateway]
-[Web Apps] ─────┘                                   │
-                                                    ├── [User Service]
-                                                    ├── [Content Service]
-                                                    ├── [Streaming Service]
-                                                    ├── [Recommendation Service]
-                                                    ├── [Search Service]
-                                                    └── [Analytics Service]
-                                                            │
-                            [Video Processing Pipeline] ── [CDN Network] ── [Origin Storage]
+┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐
+│ Mobile Apps │  │  Smart TVs  │  │ Web Clients │  │   Gaming    │
+│ (iOS/Android│  │ (Roku/Apple │  │ (React/Vue) │  │ Consoles    │
+│  React Nat.)│  │  TV/Samsung)│  │             │  │ (PS/Xbox)   │
+└──────┬──────┘  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘
+       │                │                │                │
+       └────────────────┼────────────────┼────────────────┘
+                        │                │
+              ┌─────────▼────────────────▼─────────┐
+              │      Global Load Balancer         │
+              │    (Geographic Distribution)      │
+              └─────────┬─────────────────────────┘
+                        │
+              ┌─────────▼─────────┐
+              │    API Gateway    │
+              │  - Authentication │
+              │  - Rate Limiting  │
+              │  - Request Routing│
+              └─────────┬─────────┘
+                        │
+    ┌───────────────────┼───────────────────┐
+    │                   │                   │
+┌───▼────┐  ┌──────▼──────┐  ┌──────▼──────┐
+│ User   │  │  Content    │  │ Streaming   │
+│Service │  │  Service    │  │  Service    │
+│- Auth  │  │- Metadata   │  │- Video      │
+│- Profile│  │- Catalog    │  │  Delivery   │
+│- Billing│  │- Search     │  │- Quality    │
+└───┬────┘  └──────┬──────┘  └──────┬──────┘
+    │              │                │
+    │      ┌───────▼───────┐        │
+    │      │Recommendation │        │
+    │      │   Service     │        │
+    │      │- ML Models    │        │
+    │      │- Personalize  │        │
+    │      └───────┬───────┘        │
+    │              │                │
+    │      ┌───────▼───────┐        │
+    │      │  Analytics    │        │
+    │      │   Service     │        │
+    │      │- View Tracking│        │
+    │      │- A/B Testing  │        │
+    │      └───────┬───────┘        │
+    │              │                │
+┌───▼──────────────▼────────────────▼───┐
+│           Data & Storage Layer        │
+├─────────┬─────────┬─────────┬─────────┤
+│User DB  │Content  │Analytics│ Video   │
+│(MySQL)  │Metadata │Data     │Storage  │
+│         │(Cassand)│(Hadoop) │(S3/CDN) │
+└─────────┴─────────┴─────────┴─────────┘
+```
+
+### Video Streaming Data Flow
+```
+┌─────────────────────────────────────────────────────────────┐
+│                Video Streaming Flow                         │
+└─────────────────────────────────────────────────────────────┘
+
+User ──1──► API Gateway ──2──► Streaming Service ──3──► CDN
+                                      │
+                                      4
+                                      ▼
+                               Content Service ──5──► Metadata DB
+                                      │
+                                      6
+                                      ▼
+                               Analytics ──7──► View Tracking
+                                Service
+
+1. User requests video stream
+2. Authentication & authorization
+3. Get optimal CDN endpoint
+4. Fetch video metadata
+5. Get content information
+6. Log viewing analytics
+7. Track user behavior
+
+┌─────────────────────────────────────────────────────────────┐
+│              Content Upload & Processing Flow               │
+└─────────────────────────────────────────────────────────────┘
+
+Content ──1──► Upload Service ──2──► Video Processing ──3──► Transcoding
+Creator                                   Pipeline              Farm
+                                             │
+                                             4
+                                             ▼
+                                      Quality Control ──5──► CDN Distribution
+                                             │
+                                             6
+                                             ▼
+                                      Metadata ──7──► Content Catalog
+                                      Extraction
+
+1. Content creator uploads video
+2. Initiate processing pipeline
+3. Parallel transcoding (multiple qualities)
+4. Quality assurance checks
+5. Distribute to global CDN
+6. Extract metadata & thumbnails
+7. Update content catalog
+```
+
+### Recommendation System Flow
+```
+┌─────────────────────────────────────────────────────────────┐
+│                Recommendation Generation Flow               │
+└─────────────────────────────────────────────────────────────┘
+
+User ──1──► Recommendation ──2──► User Profile ──3──► ML Models
+           Service                Service
+              │                      │
+              4                      │
+              ▼                      │
+       Content Filtering ──5─────────┘
+              │
+              6
+              ▼
+       Ranking Engine ──7──► Personalized ──8──► User Interface
+                             Recommendations
+
+1. User requests recommendations
+2. Get user viewing history & preferences
+3. Apply collaborative filtering & content-based models
+4. Filter available content
+5. Apply business rules & content policies
+6. Rank recommendations by predicted engagement
+7. Generate personalized list
+8. Display to user with A/B testing
 ```
 
 ### Core Services
