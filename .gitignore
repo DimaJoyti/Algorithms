@@ -262,3 +262,5 @@ config.local.json
 .env.development.local
 .env.test.local
 .env.production.local
+# Snyk Security Extension - AI Rules (auto-generated)
+.github/instructions/snyk_rules.instructions.md
