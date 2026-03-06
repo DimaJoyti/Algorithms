@@ -23,7 +23,7 @@ A comprehensive collection of algorithms and data structures implemented in Java
 This repository contains:
 
 - **32+ JavaScript algorithms** with full test coverage
-- **500+ Python algorithms** including LeetCode solutions
+- **1400+ Python algorithms** organized by category (LeetCode solutions)
 - Detailed complexity analysis (Big O notation)
 - Interactive examples and visualizations
 - Comparative analysis of different approaches
@@ -75,16 +75,21 @@ python BinarySearch.py
 ```
 algorithms/
 ├── javascript/                 # JavaScript implementations
-│   ├── anagrams/              # Anagram checking
-│   ├── sorting/               # Sorting algorithms
-│   ├── tree/                  # Trees and traversals
-│   ├── linkedlist/            # Linked lists
-│   └── ...                    # Other algorithms
-├── python/                    # Python implementations
-│   ├── BinarySearch.py        # Binary search
-│   ├── Fibonacci.py           # Fibonacci numbers
-│   ├── sorting/               # Sorting algorithms
-│   └── ...                    # 500+ algorithms
+│   ├── anagrams/             # Anagram checking
+│   ├── sorting/              # Sorting algorithms
+│   ├── tree/                 # Trees and traversals
+│   ├── linkedlist/           # Linked lists
+│   └── ...                   # Other algorithms
+├── python/                    # Python implementations (organized by category)
+│   ├── arrays/               # 880 array problems
+│   ├── strings/              # 227 string problems
+│   ├── trees/                # 191 tree problems
+│   ├── dynamic_programming/  # 142 DP problems
+│   ├── graphs/               # 41 graph problems
+│   ├── linked_lists/         # 69 linked list problems
+│   ├── math/                 # 40 math problems
+│   ├── misc/                 # 133 uncategorized problems
+│   └── ...                   # Other categories
 ├── docs/                      # Documentation
 ├── tests/                     # Additional tests
 └── README.md                  # This file
@@ -266,7 +271,7 @@ git push origin feature/new-algorithm
 ## 📊 Project Statistics
 
 - **JavaScript**: 32 algorithms with tests
-- **Python**: 500+ algorithms and solutions
+- **Python**: 1400+ algorithms organized in 20 categories
 - **Test Coverage**: 95%+
 - **Supported Languages**: JavaScript, Python
 - **Planned**: Go, Rust, Java
